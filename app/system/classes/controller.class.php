@@ -67,7 +67,7 @@ abstract class controller implements viewController {
 			$this->renderData($type);
 		} else {
 			// Render the viewport
-			$this->renderViewport();
+			$this->run();
 			
 			// Run the user code
 			$this->execute();

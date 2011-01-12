@@ -2,7 +2,7 @@
 // Start the application
 require_once("app/bootstrap.php");
 
-$request = isset($_GET['p']) && $_GET['p'] != "/" ? $_GET['p'] : INSTEP_SYS_DEFAULTCNTRLR;
+$request = isset($_GET['p']) && $_GET['p'] != "/" ? $_GET['p'] : SYS_DEFAULTCNTRLR;
 
 // Generate the superview.
 $superview = new view('superview');
@@ -21,7 +21,7 @@ try {
 	 	case 404:
 			// Page is not found, load the default controller.
 			$despacher->setSuperview($superview);
-			$despacher->request(INSTEP_SYS_DEFAULTCNTRLR . "/" . $request);
+			$despacher->request(SYS_DEFAULTCNTRLR . "/" . $request);
 		break;
 		
 		default:
