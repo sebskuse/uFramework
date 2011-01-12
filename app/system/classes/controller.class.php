@@ -33,15 +33,6 @@ abstract class controller implements viewController {
 			}
 		}		
 		
-		// Check to see if the user object is in the session.
-		if(isset($_SESSION['user'])){
-			$u = $_SESSION['user'];
-			if(get_class($u) == "user"){
-				$this->setObject("user", $u);
-			} else {
-				throw new Exception("Deserialised user object does not match!");
-			}
-		} 
 	}
 
 	
@@ -80,9 +71,6 @@ abstract class controller implements viewController {
 			
 			// Run the user code
 			$this->execute();
-			
-			// Write the user object out.
-			$_SESSION['user'] = $this->objects("user");
 			
 			if(isset($this->redirectTo)) header("Location: " . $this->redirectTo);
 			

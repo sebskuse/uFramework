@@ -2,7 +2,7 @@
 
 function getRuntimeObjects(){
 	
-	$objects = array(new user());
+	$objects = array();
 	
 	return $objects;
 }
