@@ -20,7 +20,6 @@ function __autoload($class_name) {
 	   		trigger_error("Unable to load class: $class_name", E_USER_WARNING);
 	  	}
 	}
-
 }
 
 ?>

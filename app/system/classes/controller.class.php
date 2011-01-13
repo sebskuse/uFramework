@@ -48,13 +48,22 @@ abstract class controller implements viewController {
 	
 	final protected function execute(){	
 		foreach($this->routeMap as $route){
-			if(preg_match($route['pattern'], implode("/", $this->context) )){
-				call_user_func(array($this, $route['function']));
+			if(preg_match($route['pattern'], implode("/", $this->context), $matches )){
+				$fn = array($this, $route['function']);
+				
+				// Check to see if we can call the function.
+				if(!is_callable($fn)) throw new Exception("Provided responder for route " . $route['pattern'] . " is invalid!");
+				// Call the function and provide matches from the pattern.
+				call_user_func($fn, array_slice($matches, 1));
 				return;
 			}		
 		}
 		
-		if($this->defaultRoute != "") call_user_func(array($this, $this->defaultRoute));
+		if($this->defaultRoute != ""){
+			$fn = array($this, $this->defaultRoute);
+			if(!is_callable($fn)) throw new Exception("Provided responder for default route is invalid!");
+			call_user_func($fn);
+		}
 	}
 
 	final protected function setViewport(view $view){
