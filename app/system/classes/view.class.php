@@ -83,6 +83,11 @@ class view {
 		return $this;
 	}
 	
+	// Alias of replaceAll
+	public function map(array $data){
+		$this->replaceAll($data);
+	}
+	
 	public function replaceWithStatic($var, $template, $path = ""){
 		if($template == "") $template = "home";
 		$fileStr = SYS_ASSETDIR . "views/" . $path . $template . ".html";
@@ -95,6 +100,7 @@ class view {
 	
 	public function reset(){
 		$this->viewSource = $this->originalView;
+		$this->replacements = array();
 	}
 	
 	public function set($view){
