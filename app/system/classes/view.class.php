@@ -10,6 +10,12 @@ class view {
 	private $viewSource;
 	private $originalView;
 	private $identifier;
+	private $replacements = array();
+	
+	const REPLACE_TPL = 0;
+	const REPLACE_REGEX = 1;
+	const REPLACE_DIRECT = 2;
+	
 	
 	public function __construct($sourcefile = "", $identifier = ""){
 		if($sourcefile == ""){
@@ -17,7 +23,7 @@ class view {
 				$this->source = "";		
 				$this->identifier = "";
 		} else {
-			$file = realpath(SYS_ASSETDIR . "views/" . $sourcefile . ".html");
+			$file = realpath( INSTEP_SYS_ASSETDIR . "views/" . $sourcefile . ".html");
 			if(file_exists($file) == true){
 				$this->viewSource = file_get_contents($file);
 				$this->source = $this->viewSource;
@@ -28,13 +34,44 @@ class view {
 		}
 	}
 	
-	public function replace($var, $fragment){
-		if(is_object( $fragment ) == true && get_class($fragment) == get_class($this) ){
-			$this->viewSource = str_ireplace("{" . strtolower($var) . "}", $fragment->get(), $this->viewSource);
-		} else {
-			$this->viewSource = str_ireplace("{" . strtolower($var) . "}", $fragment, $this->viewSource);
+	public function replace($var, $fragment, $method = view::REPLACE_TPL){
+	
+		array_push($this->replacements, array("from" => $var, "to" => $fragment));
+		
+		switch($method){
+
+			case view::REPLACE_REGEX:
+				$this->viewSource = preg_replace($var, $fragment, $this->viewSource);
+			break;
+
+			case view::REPLACE_TPL:	
+				$this->internalReplace($var, $fragment);
+			break;
+			
+			case view::REPLACE_DIRECT:
+				$this->internalReplace($var, $fragment, view::REPLACE_DIRECT);
+			break;
 		}
 		return $this;
+	}
+
+	private function internalReplace($var, $fragment, $method = view::REPLACE_TPL){
+		switch($method){
+			case view::REPLACE_TPL:
+				$format = "{" . strtolower($var) . "}";
+			break;
+
+			case view::REPLACE_DIRECT:
+				$format = $var;
+			break;
+		
+		}
+		
+		if(is_object( $fragment ) == true && get_class($fragment) == get_class($this) ){
+			$this->viewSource = str_ireplace($format, $fragment->get(), $this->viewSource);
+		} else {
+			$this->viewSource = str_ireplace($format, $fragment, $this->viewSource);
+		}
 	}
 	
 	public function replaceAll(array $data){
@@ -46,7 +83,7 @@ class view {
 	
 	public function replaceWithStatic($var, $template, $path = ""){
 		if($template == "") $template = "home";
-		$fileStr = SYS_ASSETDIR . "views/" . $path . $template . ".html";
+		$fileStr = INSTEP_SYS_ASSETDIR . "views/" . $path . $template . ".html";
 		if(file_exists($fileStr) == true){
 			$this->viewSource = str_ireplace("{" . strtolower($var) . "}", file_get_contents($fileStr), $this->viewSource);
 		} else {
