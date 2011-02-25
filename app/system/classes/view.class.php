@@ -11,6 +11,8 @@ class view {
 	private $originalView;
 	private $identifier;
 	private $replacements = array();
+	private $triggers = array();
+	private $wrapperChars = array("{", "}");
 	
 	const REPLACE_TPL = 0;
 	const REPLACE_REGEX = 1;
@@ -20,13 +22,13 @@ class view {
 	public function __construct($sourcefile = "", $identifier = ""){
 		if($sourcefile == ""){
 				$this->viewSource = "";
-				$this->source = "";		
+				$this->originalView = "";		
 				$this->identifier = "";
 		} else {
 			$file = realpath( SYS_ASSETDIR . "views/" . $sourcefile . ".html");
 			if(file_exists($file) == true){
 				$this->viewSource = file_get_contents($file);
-				$this->source = $this->viewSource;
+				$this->originalView = $this->viewSource;
 				$this->identifier = ($identifier == "") ? $sourcefile : "";
 			} else {
 				throw new Exception("View not found! " . $file);
@@ -58,7 +60,7 @@ class view {
 	private function internalReplace($var, $fragment, $method = view::REPLACE_TPL){
 		switch($method){
 			case view::REPLACE_TPL:
-				$format = "{" . strtolower($var) . "}";
+				$format = $this->wrapperChars[0] . strtolower($var) . $this->wrapperChars[1];
 			break;
 
 			case view::REPLACE_DIRECT:
@@ -85,23 +87,27 @@ class view {
 		if($template == "") $template = "home";
 		$fileStr = SYS_ASSETDIR . "views/" . $path . $template . ".html";
 		if(file_exists($fileStr) == true){
-			$this->viewSource = str_ireplace("{" . strtolower($var) . "}", file_get_contents($fileStr), $this->viewSource);
+			$this->viewSource = str_ireplace($this->wrapperChars[0] . strtolower($var) . $this->wrapperChars[1], file_get_contents($fileStr), $this->viewSource);
 		} else {
 			throw new Exception("View not found!");
 		}
 	}
 	
 	public function reset(){
-		$this->viewSource = $this->source;
+		$this->viewSource = $this->originalView;
 	}
 	
 	public function set($view){
 		$this->viewSource = $view;
 		$this->originalView = $view;
+		
+		return $this;
 	}
 	
 	public function append($view){
 		$this->viewSource .= $view;
+		
+		return $this;
 	}
 	
 	public function setIdentifier($ident){
