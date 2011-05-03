@@ -33,6 +33,15 @@ abstract class controller implements viewController {
 			}
 		}		
 		
+		// Check to see if the user object is in the session.
+		if(isset($_SESSION['user'])){
+			$u = $_SESSION['user'];
+			if(get_class($u) == "user"){
+				$this->setObject("user", $u);
+			} else {
+				throw new Exception("Deserialised user object does not match!");
+			}
+		} 
 	}
 
 	
@@ -50,7 +59,7 @@ abstract class controller implements viewController {
 		foreach($this->routeMap as $route){
 			if(preg_match($route['pattern'], implode("/", $this->context), $matches )){
 				$fn = array($this, $route['function']);
-				
+
 				// Check to see if we can call the function.
 				if(!is_callable($fn)) throw new Exception("Provided responder for route " . $route['pattern'] . " is invalid!");
 				// Call the function and provide matches from the pattern.
@@ -58,7 +67,7 @@ abstract class controller implements viewController {
 				return;
 			}		
 		}
-		
+
 		if($this->defaultRoute != ""){
 			$fn = array($this, $this->defaultRoute);
 			if(!is_callable($fn)) throw new Exception("Provided responder for default route is invalid!");
@@ -76,10 +85,13 @@ abstract class controller implements viewController {
 			$this->renderData($type);
 		} else {
 			// Render the viewport
-			$this->run();
+			$this->renderViewport();
 			
 			// Run the user code
 			$this->execute();
+			
+			// Write the user object out.
+			$_SESSION['user'] = $this->objects("user");
 			
 			if(isset($this->redirectTo)) header("Location: " . $this->redirectTo);
 			
@@ -93,6 +105,8 @@ abstract class controller implements viewController {
 		$this->superview->replace('include-url', SYS_INCLUDEURL);
 		$this->superview->replace('base-url', BASEURL);
 		$this->superview->replace('additional-assets', "");
+		$this->superview->replace('version', REALISE_VERSION);
+		$this->superview->replace('dev', (DEV) ? "DEV" : "");
 
 		echo $this->superview->get();		
 	}

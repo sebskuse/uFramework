@@ -2,7 +2,7 @@
 
 interface viewController {
 	
-	public function run();
+	public function renderViewport();
 	
 }
 
