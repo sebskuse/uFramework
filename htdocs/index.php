@@ -1,6 +1,6 @@
 <?php
 // Start the application
-require_once("../app/bootstrap.php");
+require_once("../app/system/bootstrap.php");
 
 $request = isset($_GET['p']) && $_GET['p'] != "/" ? $_GET['p'] : SYS_DEFAULTCNTRLR;
 
